@@ -26,6 +26,52 @@ def posts_get():
 
     # Convert the posts to JSON and return a response
     data = json.dumps([post.as_dictionary() for post in posts])
-    return Response(data, 200, mimetype="application/json")  
+    return Response(data, 200, mimetype="application/json")
   
+
+  
+@app.route("/api/posts", methods=["POST"])
+@decorators.accept("application/json")
+def posts_post():
+    """ Add a new post """
+    data = request.json
+
+    # Add the post to the database
+    post = models.Post(title=data["title"], body=data["body"])
+    session.add(post)
+    session.commit()
+
+    # Return a 201 Created, containing the post as JSON and 
+    #according to the tutorial with the
+    #Location header set to the location of the post
+    #but that gives an error so I commented it out
+    data = json.dumps(post.as_dictionary())
+    headers = {"Location": url_for("posts_get")}   #, id=post.id)}
+    return Response(data, 201, headers=headers,
+                    mimetype="application/json")
+  
+  
+@app.route("/api/edit/<id>", methods=["PUT"])
+@decorators.accept("application/json")
+def posts_put(id):
+    """ Update an existing post """
+    data = request.json
+    #first you create a post
+    post = models.Post(title="example title", body="example body")
+    session.add(post)
+    session.commit()
+    # Update the post in the database
+    post = session.query(models.Post).get(id)
+    post.title=data["title"]
+    post.body=data["body"]
+    session.commit()
+
+    # Return a 201 Created, containing the post as JSON and 
+    #according to the tutorial with the
+    #Location header set to the location of the post
+    #but that gives an error so I commented it out
+    data = json.dumps(post.as_dictionary())
+    headers = {"Location": url_for("posts_get")}   #, id=post.id)}
+    return Response(data, 201, headers=headers,
+                    mimetype="application/json")
   
