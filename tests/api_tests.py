@@ -91,7 +91,10 @@ class TestAPI(unittest.TestCase):
             "title": "UPDATED Example Post",
             "body": "Just an UPDATED test"
         }
-
+        #first you create a post
+        post = models.Post(title="example title", body="example body")
+        session.add(post)
+        session.commit()
         response = self.client.put("/api/edit/1",
             data=json.dumps(data),
             content_type="application/json",

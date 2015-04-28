@@ -56,16 +56,14 @@ def posts_post():
 def posts_put(id):
     """ Update an existing post """
     data = request.json
-    #first you create a post
-    post = models.Post(title="example title", body="example body")
-    session.add(post)
-    session.commit()
+
     # Update the post in the database
     post = session.query(models.Post).get(id)
+    if not post:
+      return Response('Not Found', status=404)
     post.title=data["title"]
     post.body=data["body"]
     session.commit()
-
     # Return a 201 Created, containing the post as JSON and 
     #according to the tutorial with the
     #Location header set to the location of the post
